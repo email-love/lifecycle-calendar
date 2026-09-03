@@ -7,7 +7,15 @@
 #
 # Files are staged through an explicit allowlist rather than zipped in place, so a
 # stray file in a skill directory cannot silently end up in a published archive.
+#
+# Builds are DETERMINISTIC: staged files are stamped with one fixed timestamp,
+# added in sorted path order, and stripped of extra zip attributes. The same
+# source tree therefore produces a byte-identical archive on any machine, so a
+# published release asset can be independently re-derived and checksum-compared.
 set -euo pipefail
+
+# One fixed timestamp for reproducibility (zip stores local mtimes).
+STAMP="202601010000"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST="$ROOT/dist"
@@ -64,7 +72,10 @@ for skill in "$ROOT"/skills/*/; do
     exit 1
   fi
 
-  ( cd "$STAGE" && zip -qrX "$DIST/$name.skill" "$name" )
+  # Deterministic: fixed mtime, sorted entry order, no extra attributes.
+  find "$pkg" -exec touch -t "$STAMP" {} +
+  ( cd "$STAGE" && find "$name" \( -type f -o -type d \) | LC_ALL=C sort \
+      | zip -qX "$DIST/$name.skill" -@ )
   built=$((built + 1))
   echo "built dist/$name.skill"
 done
