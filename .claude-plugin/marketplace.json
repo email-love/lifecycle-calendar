@@ -1,0 +1,22 @@
+{
+  "name": "email-love-lifecycle-calendar",
+  "owner": {
+    "name": "Email Love",
+    "email": "hello@emaillove.com",
+    "url": "https://emaillove.com"
+  },
+  "description": "Email Love lifecycle calendar skill: build a ranked year-of-moments campaign calendar in Notion, with competitive evidence from real marketing emails behind every Core moment",
+  "plugins": [
+    {
+      "name": "competitive-lifecycle-calendar",
+      "source": "./skills/competitive-lifecycle-calendar",
+      "version": "1.0.0",
+      "description": "Builds a ranked year-of-moments lifecycle calendar in Notion with competitive evidence from the Email Love library: real competitor send dates, offers and discount depths behind every Core moment, plus an offer guardrails summary across the competitive set. Requires the Notion connector and the Email Love Inspiration MCP",
+      "author": {
+        "name": "Email Love"
+      },
+      "license": "MIT",
+      "homepage": "https://github.com/email-love/lifecycle-calendar"
+    }
+  ]
+}

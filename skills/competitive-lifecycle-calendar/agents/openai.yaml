@@ -1,0 +1,9 @@
+# ChatGPT presentation metadata (Agent Skills open standard).
+# Claude ignores this file entirely - the same skill folder works on both platforms.
+# Schema: https://github.com/openai/codex/blob/main/codex-rs/skills/src/assets/samples/skill-creator/references/openai_yaml.md
+interface:
+  display_name: "Competitive Lifecycle Calendar"
+  short_description: "Build a year of campaign moments in Notion, backed by what competitors actually sent"
+  default_prompt: "Use $competitive-lifecycle-calendar to build a lifecycle calendar in Notion for my brand, with competitive evidence behind every Core moment."
+policy:
+  allow_implicit_invocation: true
