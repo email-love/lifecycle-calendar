@@ -17,6 +17,11 @@ byte-identical to 1.0.0.
   and the skill stays where it was, at `skills/competitive-lifecycle-calendar/`.
 - The Claude Code plugin id is unchanged:
   `competitive-lifecycle-calendar@email-love-lifecycle-calendar`.
+- `.skill` builds no longer depend on the builder's umask or on zip options set in
+  the `ZIP` and `ZIPOPT` environment variables. `scripts/build.sh` sets staged
+  directories to 0755 and unsets both variables, so the same source gives the same
+  bytes on any machine with Info-ZIP zip 3.0, the `zip` that ships with macOS and
+  Ubuntu.
 
 ## [1.0.0] - 2026-09-02
 
