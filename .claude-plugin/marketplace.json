@@ -9,8 +9,9 @@
   "plugins": [
     {
       "name": "competitive-lifecycle-calendar",
-      "source": "./skills/competitive-lifecycle-calendar",
-      "version": "1.0.0",
+      "source": "./",
+      "displayName": "Competitive Lifecycle Calendar",
+      "version": "1.0.1",
       "description": "Builds a ranked year-of-moments lifecycle calendar in Notion with competitive evidence from the Email Love library: real competitor send dates, offers and discount depths behind every Core moment, plus an offer guardrails summary across the competitive set. Requires the Notion connector and the Email Love Inspiration MCP",
       "author": {
         "name": "Email Love"

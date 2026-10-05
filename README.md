@@ -77,9 +77,15 @@ reinstall. Remove with `claude plugin uninstall competitive-lifecycle-calendar@e
 
 ### Claude apps (web, desktop, Cowork)
 
-Download `competitive-lifecycle-calendar.skill` from [Releases](../../releases), or
-build it yourself with `bash scripts/build.sh`. Then **Customize → Skills → + →
-Create skill → Upload a skill**.
+Add this repository as a marketplace: **Customize → Plugins → Add → Add
+marketplace**, enter `email-love/lifecycle-calendar`, then install **Competitive
+Lifecycle Calendar** from it. **Check for updates** on the marketplace pulls new
+versions, or turn on **Sync automatically**.
+
+To install without a marketplace, upload the skill instead. Download
+`competitive-lifecycle-calendar.skill` from [Releases](../../releases), or build it
+yourself with `bash scripts/build.sh`. Then **Customize → Skills → + → Create
+skill → Upload a skill**.
 
 An uploaded skill is a snapshot, not a subscription. It does not update itself. To
 move to a new version, download the new `.skill` and upload it again; the same name
@@ -156,6 +162,11 @@ The reference files carry the weight on purpose. Both platforms load them only w
 the skill reaches that step, so depth there is close to free, while depth in
 `SKILL.md` is paid on every trigger.
 
+For Claude's marketplace installs, the repository root doubles as the plugin.
+`.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` point Claude Code
+and the Claude apps at the same `skills/` folder, so there is still one copy of the
+skill.
+
 ## Contributing
 
 The most useful contribution is a report from a category we have not tried. Open an
@@ -168,8 +179,10 @@ bash scripts/build.sh           # package the skill into dist/*.skill
 bash scripts/verify_dist.sh     # zip integrity, inventory, licence, checksums
 ```
 
-Changing the version means editing `VERSION` and adding a matching `## [x.y.z]`
-section to `CHANGELOG.md`. The validator checks that the marketplace manifest agrees.
+Changing the version means editing `VERSION`, the `version` in both
+`.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, and adding a
+matching `## [x.y.z]` section to `CHANGELOG.md`. The validator checks that all four
+agree, and that the plugin still has the layout the Claude apps require.
 
 ## Credit
 
