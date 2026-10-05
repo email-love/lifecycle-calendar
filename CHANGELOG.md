@@ -3,6 +3,21 @@
 User-visible changes to the Competitive Lifecycle Calendar skill, newest first.
 Every release attaches the `.skill` bundle and a `SHA256SUMS` file.
 
+## [1.0.1] - 2026-10-05
+
+A packaging fix. The skill itself is unchanged, and the `.skill` bundle is
+byte-identical to 1.0.0.
+
+- Adding this repository as a marketplace in the Claude apps (**Customize →
+  Plugins → Add marketplace** in Cowork, the desktop app or claude.ai) failed with
+  "Marketplace sync failed". Those apps require a `.claude-plugin/plugin.json`
+  manifest in the plugin folder, and the plugin folder had none. Claude Code never
+  required one, so installs there were unaffected.
+- The repository root is now the plugin. It carries `.claude-plugin/plugin.json`,
+  and the skill stays where it was, at `skills/competitive-lifecycle-calendar/`.
+- The Claude Code plugin id is unchanged:
+  `competitive-lifecycle-calendar@email-love-lifecycle-calendar`.
+
 ## [1.0.0] - 2026-09-02
 
 First release, split out of [email-love/claude-skills](https://github.com/email-love/claude-skills)

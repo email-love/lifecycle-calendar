@@ -5,8 +5,9 @@ Every check here exists because the failure it catches is silent. A malformed
 description means the skill never triggers and nobody sees an error. A version
 that disagrees between the changelog and the marketplace manifest installs the
 wrong thing. A reference file the skill points at but does not ship leaves the
-model following a dead link mid-build. None of these break a build on their own,
-so the build has to be taught to care.
+model following a dead link mid-build. A plugin folder without its own manifest
+installs in Claude Code and fails in the Claude apps behind a generic sync error.
+None of these break a build on their own, so the build has to be taught to care.
 
     python3 scripts/validate.py
 """
@@ -164,22 +165,57 @@ def check_versions() -> None:
         return
 
     manifest = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
-    names = {s.name for s in SKILLS}
-    listed = set()
-    for plugin in manifest.get("plugins", []):
-        listed.add(plugin.get("name"))
+    plugins = manifest.get("plugins", [])
+    if not plugins:
+        errors.append("marketplace.json lists no plugins")
+    for plugin in plugins:
         if plugin.get("version") != version:
             errors.append(
                 f"marketplace.json: {plugin.get('name')} is {plugin.get('version')}, VERSION is {version}")
-        source = ROOT / str(plugin.get("source", "")).lstrip("./")
-        if not (source / "SKILL.md").exists():
-            errors.append(f"marketplace.json: {plugin.get('name')} source {plugin.get('source')} has no SKILL.md")
-    if listed != names:
-        errors.append(f"marketplace.json lists {sorted(listed)}, skills/ holds {sorted(names)}")
+        check_plugin(plugin, version)
 
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     if f"## [{version}]" not in changelog:
         errors.append(f"CHANGELOG.md has no `## [{version}]` section")
+
+
+def check_plugin(entry: dict, version: str) -> None:
+    """A marketplace entry must install in the Claude apps, not just Claude Code.
+
+    Claude Code accepts a bare skill folder as a plugin, so `claude plugin
+    install` succeeds on a layout the Claude apps reject: adding the marketplace
+    in Cowork or claude.ai fails with only "Marketplace sync failed". Those apps
+    need the plugin folder to hold .claude-plugin/plugin.json, named like the
+    marketplace entry, with each skill at skills/<name>/SKILL.md beside it. A
+    top-level bin/ directory stops them installing the plugin at all.
+    """
+    name = entry.get("name")
+    source = entry.get("source")
+    if not isinstance(source, str) or not source.startswith("./") or ".." in source:
+        errors.append(f"marketplace.json: {name} source {source!r} is not a ./ path inside the repository")
+        return
+    root = (ROOT / source).resolve()
+
+    path = root / ".claude-plugin" / "plugin.json"
+    if not path.exists():
+        errors.append(f"marketplace.json: {name} source {source} has no .claude-plugin/plugin.json")
+        return
+    try:
+        plugin = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        errors.append(f"{rel(path)}: not valid JSON - {exc}")
+        return
+    if plugin.get("name") != name:
+        errors.append(f"{rel(path)}: name `{plugin.get('name')}` != marketplace entry `{name}`")
+    if plugin.get("version") != version:
+        errors.append(f"{rel(path)}: version is {plugin.get('version')}, VERSION is {version}")
+
+    shipped = sorted(p.parent.name for p in (root / "skills").glob("*/SKILL.md"))
+    expected = [s.name for s in SKILLS]
+    if shipped != expected:
+        errors.append(f"marketplace.json: {name} ships skills {shipped}, skills/ holds {expected}")
+    if (root / "bin").exists():
+        errors.append(f"marketplace.json: {name} has a top-level bin/, which the Claude apps refuse")
 
 
 def check_hygiene() -> None:
